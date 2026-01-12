@@ -1607,28 +1607,24 @@ static int doLoad(char** argv, char * const envp[]) {
     // both S and T require kernel 4.9 (and eBpf support)
     // (this also guarantees 'kernelVer' isn't an invalid uninitialized 0)
     if (!isAtLeastKernelVersion(4, 9)) {
-        ALOGE("Android S & T require kernel 4.9.");
-        return 3;
+        ALOGW("Android S & T require kernel 4.9.");
     }
 
     // U bumps the kernel requirement up to 4.14
     if (isAtLeastU && !isAtLeastKernelVersion(4, 14)) {
-        ALOGE("Android U requires kernel 4.14.");
-        return 4;
+        ALOGW("Android U requires kernel 4.14.");
     }
 
     // V bumps the kernel requirement up to 4.19
     // see also: //system/netd/tests/kernel_test.cpp TestKernel419
     if (isAtLeastV && !isAtLeastKernelVersion(4, 19)) {
-        ALOGE("Android V requires kernel 4.19.");
-        return 5;
+        ALOGW("Android V requires kernel 4.19.");
     }
 
     // 25Q2 bumps the kernel requirement up to 5.4
     // see also: //system/netd/tests/kernel_test.cpp TestKernel54
     if (isAtLeast25Q2 && !isAtLeastKernelVersion(5, 4)) {
-        ALOGE("Android 25Q2 requires kernel 5.4.");
-        return 6;
+        ALOGW("Android 25Q2 requires kernel 5.4.");
     }
 
     // 25Q4 bumps the kernel requirement up to 5.10
@@ -1668,22 +1664,6 @@ static int doLoad(char** argv, char * const envp[]) {
             ALOGW("Android V+ only supports LTS kernels.");
             bad = true;
         }
-
-#define REQUIRE(maj, min, sub) \
-        if (isKernelVersion(maj, min) && !isAtLeastKernelVersion(maj, min, sub)) { \
-            ALOGW("Android V+ requires %d.%d kernel to be %d.%d.%d+.", maj, min, maj, min, sub); \
-            bad = true; \
-        }
-
-        REQUIRE(4, 19, 236)
-        REQUIRE(5, 4, 186)
-        REQUIRE(5, 10, 199)
-        REQUIRE(5, 15, 136)
-        REQUIRE(6, 1, 57)
-        REQUIRE(6, 6, 0)
-        REQUIRE(6, 12, 0)
-
-#undef REQUIRE
 
         if (bad) {
             ALOGE("Unsupported kernel version (%07x).", kernelVer);
